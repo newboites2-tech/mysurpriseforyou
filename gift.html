@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Be My Valentine 💘</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:linear-gradient(135deg,#ffd6e8,#ffeef6);
+  font-family:Arial, sans-serif;
+  overflow:hidden;
+  animation: pulseBackground 10s ease-in-out infinite;
+}
+
+@keyframes pulseBackground {
+  0% { background: linear-gradient(135deg, #ffd6e8,#ffeef6); }
+  50% { background: linear-gradient(135deg, #ffb6c1,#ff9fcc); }
+  100% { background: linear-gradient(135deg, #ffd6e8,#ffeef6); }
+}
+
+.card{
+  position:relative;
+  background:white;
+  padding:35px;
+  border-radius:20px;
+  text-align:center;
+  box-shadow:0 20px 40px rgba(0,0,0,.2);
+  animation: pop .8s ease, floatCard 4s ease-in-out infinite;
+  z-index:2;
+}
+@keyframes pop{
+  from{transform:scale(.5);opacity:0}
+  to{transform:scale(1);opacity:1}
+}
+@keyframes floatCard {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0); }
+}
+
+img{
+  width:130px;
+  height:130px;
+  border-radius:50%;
+  object-fit:cover;
+  margin-bottom:15px;
+  box-shadow:0 10px 20px rgba(0,0,0,.25);
+  transition: transform 1s;
+}
+
+h2{margin:10px 0; line-height:1.5; font-size:24px;}
+
+.buttons{
+  display:flex;
+  gap:20px;
+  justify-content:center;
+  margin-top:20px;
+  position:relative;
+  height:50px;
+  display:none; /* hide initially */
+}
+button{
+  padding:10px 25px;
+  border:none;
+  border-radius:20px;
+  font-size:16px;
+  cursor:pointer;
+  transition:.3s;
+}
+#yes{background:#ff4d88;color:white;}
+#yes:hover{animation:heartBeat 0.8s infinite;}
+#no{background:#ddd;}
+
+@keyframes heartBeat {
+  0%, 100% { transform: scale(1); }
+  25%, 75% { transform: scale(1.2); }
+  50% { transform: scale(1.4); }
+}
+
+.celebration{
+  position:fixed;
+  inset:0;
+  background:linear-gradient(135deg,#ffb6c1,#ffd6e8);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  z-index:5;
+  overflow:hidden;
+}
+.celebration h1{
+  color:white;
+  font-size:50px;
+  animation:zoom 1s infinite alternate, textGlow 2s ease-in-out infinite;
+  z-index:2;
+}
+@keyframes zoom{
+  from{transform:scale(1)}
+  to{transform:scale(1.2)}
+}
+@keyframes textGlow {
+  0%, 100% { text-shadow: 0 0 10px #fff, 0 0 20px #ff69b4; }
+  50% { text-shadow: 0 0 20px #fff, 0 0 40px #ff1493; }
+}
+
+.heart{
+  position:fixed;
+  font-size:22px;
+  opacity:0;
+  will-change: transform, opacity;
+}
+
+.handHeart{
+  position:absolute;
+  font-size:30px;
+  top: 50px;
+  transition: transform 0.5s ease-in-out;
+}
+#hand1{
+  left: -40px;
+}
+#hand2{
+  right: -40px;
+}
+
+.confetti{
+  position:fixed;
+  width:10px;
+  height:10px;
+  top:0;
+  opacity:0.9;
+  border-radius:50%;
+}
+</style>
+</head>
+<body>
+
+<div class="card" id="card">
+  <img src="./images/pic.jpg" alt="valentine" id="mainImg">
+  <!-- HAND-HOLDING HEARTS -->
+  <div class="handHeart" id="hand1">❤️</div>
+  <div class="handHeart" id="hand2">❤️</div>
+
+  <h2 id="text">
+    <span id="rotating"></span>
+  </h2>
+  <div class="buttons" id="buttons">
+    <button id="yes">Yes 💖</button>
+    <button id="no">No 😈</button>
+  </div>
+</div>
+
+<div id="sideHearts"></div>
+
+<div class="celebration" id="celebration">
+  <h1>💖 YAAAY I LOVE YOU 💖</h1>
+</div>
+
+<audio id="music" src="music.mp3"></audio>
+
+<script>
+/* ROTATING PHRASES */
+const phrases = ["My love", "My Everything", "My Soulmate"];
+let index = 0;
+const rotating = document.getElementById("rotating");
+const buttons = document.getElementById("buttons");
+
+function showNextPhrase() {
+  if(index < phrases.length){
+    rotating.innerText = phrases[index];
+    index++;
+  } else {
+    rotating.innerText = "Will you be my valentine?";
+    buttons.style.display = "flex";
+    clearInterval(phraseInterval);
+  }
+}
+
+let phraseInterval = setInterval(showNextPhrase, 1500);
+showNextPhrase();
+
+/* SIDE HEARTS */
+const sideHearts = document.getElementById("sideHearts");
+for(let i=0;i<3;i++){
+  const heart = document.createElement("div");
+  heart.className = "heart";
+  heart.innerHTML = "❤️";
+  heart.style.left = "calc(50% + 100px)";
+  heart.style.top = 50 + i*50 + "px";
+  sideHearts.appendChild(heart);
+
+  let start = null;
+  function animateHeart(ts){
+    if(!start) start = ts;
+    const progress = (ts-start)/2000;
+    heart.style.transform = `translateX(${Math.sin(progress*2*Math.PI)*20}px) translateY(${Math.sin(progress*2*Math.PI)*10}px)`;
+    requestAnimationFrame(animateHeart);
+  }
+  requestAnimationFrame(animateHeart);
+}
+
+/* NO BUTTON ESCAPE */
+document.getElementById("no").addEventListener("mouseenter", ()=>{
+  const x = Math.random()*120-60;
+  const y = Math.random()*60-30;
+  document.getElementById("no").style.transform=`translate(${x}px, ${y}px)`;
+});
+
+/* MAGIC EMOJIS */
+function createMagicEmoji(){
+  const emojis = ["❤️","💕","😍","🌸","🌹","🌺","🌷"];
+  const e = document.createElement("div");
+  e.className="heart";
+  e.innerHTML = emojis[Math.floor(Math.random()*emojis.length)];
+  e.style.left = Math.random()*100 + "vw";
+  e.style.fontSize = (Math.random()*40 + 20) + "px";
+  document.body.appendChild(e);
+
+  const duration = Math.random()*2000 + 3000;
+  const amplitude = Math.random()*50 + 20;
+  let start = null;
+
+  function animate(timestamp){
+    if(!start) start=timestamp;
+    const progress = (timestamp-start)/duration;
+    if(progress>1){ e.remove(); return; }
+    const x = amplitude*Math.sin(progress*2*Math.PI*3);
+    const y = window.innerHeight*(1-progress);
+    e.style.transform = `translate(${x}px, ${y}px) rotate(${progress*720}deg) scale(${1 + Math.sin(progress*3*Math.PI)/2})`;
+    e.style.opacity = 1 - progress;
+    requestAnimationFrame(animate);
+  }
+  requestAnimationFrame(animate);
+}
+setInterval(createMagicEmoji, 300);
+
+/* SPARKLES */
+function createSparkle(){
+  const sparkle = document.createElement("div");
+  sparkle.className = "confetti";
+  sparkle.style.width = sparkle.style.height = (Math.random()*6+2)+"px";
+  sparkle.style.background = "#fff";
+  sparkle.style.left = Math.random()*100+"vw";
+  sparkle.style.top = "-10px";
+  document.body.appendChild(sparkle);
+
+  let start = null;
+  function animate(ts){
+    if(!start) start=ts;
+    const prog = (ts-start)/2000;
+    if(prog>1){ sparkle.remove(); return; }
+    sparkle.style.transform = `translateY(${prog*window.innerHeight}px) scale(${Math.sin(prog*Math.PI*2)+1})`;
+    requestAnimationFrame(animate);
+  }
+  requestAnimationFrame(animate);
+}
+setInterval(createSparkle, 150);
+
+/* HAND-HELD HEARTS ANIMATION */
+const hand1 = document.getElementById("hand1");
+const hand2 = document.getElementById("hand2");
+
+function animateHands(){
+  hand1.style.transform = `translateY(${Math.sin(Date.now()/300)*10}px) rotate(${Math.sin(Date.now()/300)*15}deg)`;
+  hand2.style.transform = `translateY(${Math.sin(Date.now()/300 + Math.PI)*10}px) rotate(${Math.sin(Date.now()/300 + Math.PI)*15}deg)`;
+  requestAnimationFrame(animateHands);
+}
+animateHands();
+
+/* YES BUTTON CLICK */
+document.getElementById("yes").onclick = ()=>{
+  document.getElementById("card").style.display="none";
+  document.getElementById("celebration").style.display="flex";
+  document.getElementById("music").play();
+
+  setInterval(createMagicEmoji, 50);
+
+  setInterval(()=>{
+    const conf = document.createElement("div");
+    conf.className="confetti";
+    conf.style.left=Math.random()*100+"vw";
+    conf.style.width=conf.style.height=(Math.random()*10+5)+"px";
+    conf.style.background=['#ff4d88','#ffb6c1','#fff','#f9d','#f0a','#ffd700','#ff69b4','#00ffff','#ff1493'].sort(()=>0.5-Math.random())[0];
+    document.body.appendChild(conf);
+    let confStart=null;
+    function confettiAnim(ts){
+      if(!confStart) confStart=ts;
+      const prog=(ts-confStart)/3000;
+      if(prog>1){conf.remove();return;}
+      const x = parseFloat(conf.style.left) + 50*Math.sin(prog*2*Math.PI);
+      const y = prog*window.innerHeight;
+      conf.style.transform=`translate(${x}px, ${y}px) rotate(${prog*720}deg)`;
+      requestAnimationFrame(confettiAnim);
+    }
+    requestAnimationFrame(confettiAnim);
+  },30);
+};
+</script>
+</body>
+</html>
